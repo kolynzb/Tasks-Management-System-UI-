@@ -1,8 +1,9 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { getTheme } from '../model/data'
+import Spinner from "../assets/icons/tube-spinner.svg"
 
-const button = ({loading, title, onClick}) => {
+const button = ({loading, title, onClick, fullwidth, contain}) => {
 
   const theme = useSelector(getTheme)
 
@@ -15,12 +16,12 @@ const button = ({loading, title, onClick}) => {
       color: theme?.paper,
       border: "none",
       outline: "none",
-      width: "81%",
+      width: fullwidth ? "98%" : contain ? "max-content" : "81%",
       boxShadow: "10px 10px 20px rgba(0,0,0,.1)",
       padding: 17,
       borderRadius: 5
     }}>
-      {title}
+      {loading ? <img src={Spinner} height={18}/>: title}
     </button>
   )
 }
