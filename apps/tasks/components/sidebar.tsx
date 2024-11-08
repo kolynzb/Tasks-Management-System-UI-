@@ -38,11 +38,11 @@ const sidebar = () => {
       label: "View all companies",
       link: "/admin/companies"
     },
-    {
-      icon: <FaUserAlt style={{marginRight: 10}} color={theme?.text}/>,
-      label: "view all users",
-      link: "/admin/users"
-    },
+    // {
+    //   icon: <FaUserAlt style={{marginRight: 10}} color={theme?.text}/>,
+    //   label: "view all users",
+    //   link: "/admin/users"
+    // },
     {
       icon: <FaLock style={{marginRight: 10}} color={theme?.text}/>,
       label: "Change password",
@@ -147,8 +147,9 @@ const sidebar = () => {
   },[])
 
   return (
-    <div style={{background: theme?.paper
-      , overflowY: "scroll",
+    <div style={{background: theme?.paper,
+      // , overflowY: "scroll",
+      boxShadow: "10px 10px 20px rgba(50,50,50,.05)",
       width: "24%",
       height: "100%",
       borderRadius: 10

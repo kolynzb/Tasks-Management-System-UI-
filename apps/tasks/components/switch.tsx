@@ -6,7 +6,10 @@ import {motion} from "framer-motion"
 
 export interface Props{
     rows?: any[]
-    row?: object
+    row?: object,
+    setActive?: (active: boolean) => void
+    is_active?: boolean
+    toggle: any
 }
 
 const Switch = (props: Props) => {
@@ -24,12 +27,33 @@ const Switch = (props: Props) => {
         }
     },[isActive])
 
+
+    useEffect(()=>{
+      props?.setActive && props?.setActive(isActive)
+    }, [isActive])
+
+    useEffect(()=>{
+
+      setIsActive(props?.is_active)
+
+    }, [])
+
+    // useEffect(()=>{
+
+    //   if(props?.toggle){
+    //     if(props?.row["is_active"] != isActive){
+    //       props?.toggle(props?.row["id"], isActive)
+    //     }
+    //   }
+
+    // }, [isActive])
+
   return (
 
     // track 
     <div 
     
-    onClick={()=>setIsActive(!isActive)}
+    onClick={()=>{setIsActive(!isActive); props?.toggle &&  props?.toggle(props?.row["id"], !isActive)}}
 
     style={{
         width: 40,

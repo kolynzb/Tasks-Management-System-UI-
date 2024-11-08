@@ -4,7 +4,7 @@ import { FaCirclePlus, FaEye, FaPen } from "react-icons/fa6";
 import { getTheme, SERVER_URL, setAlert, setLoadingState } from "../../model/data";
 import { useDispatch, useSelector } from "react-redux";
 import { Theme, User } from "../../types";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaTrashAlt } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 import Input from "../../components/input";
@@ -28,6 +28,7 @@ const company = () => {
   const [departments, setDepartments] = useState<any[]>([]);
   const { id } = useParams();
   const dispatch = useDispatch()
+  const [currentDepartment, setCurrentDepartment] = useState(null)
 
   const [company, setCompany] = useState({
     name: "",
@@ -63,7 +64,25 @@ const company = () => {
     DELETE({data: departments, setData: setDepartments, path: "/department/" + id,id: id })
   }
 
+  useEffect(()=>{
+
+    if(!open){
+      setCurrentDepartment(null)
+    }
+
+  }, [open])
+
+  const editDepartment =(row)=>{
+    setCurrentDepartment(row)
+    setOpen(true)
+  }
+
+  const updateDepartment=(payload)=>{
+    setDepartments(departments?.map(department => department["id"] == payload["id"] ? payload : department))
+  }
+
   return (
+    JSON.parse(localStorage.getItem("TMS_USER"))?.role == "admin" || JSON.parse(localStorage.getItem("TMS_USER"))?.role == "company_admin" ? 
     <div>
       {/* header  */}
       <Header
@@ -80,6 +99,7 @@ const company = () => {
         <Text is_h1>No results found</Text>
         :
         <Table
+        editor={editDepartment}
         setter={setter}
         columns={["name", "admin_email"]}
         rows={departments}
@@ -90,9 +110,13 @@ const company = () => {
       />
       }
 
-      {open && <Modal title="add deparment" open={open} setOpen={setOpen} content={<AddDepartment add={addDepartment} setOpen={setOpen}/>}/>
+      {open && <Modal title={currentDepartment ? "Edit department" : "Add department"} open={open}  setOpen={setOpen} content={<AddDepartment updateDept={updateDepartment} values={currentDepartment && currentDepartment}  add={addDepartment} setOpen={setOpen}/>}/>
       }
     </div>
+    :
+    (
+      <Navigate to={"/"}/>
+    ) 
   );
 };
 

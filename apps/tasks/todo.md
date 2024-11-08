@@ -46,3 +46,42 @@ dashboard
 - user distribution (company admins, department admins, employees)
 
 }
+
+
+
+
+============================================================================================================
+
+update company:
+
+    if name != old_name:
+    
+
+    if name == old_name and email == old_email and password is empyty:
+
+        alert no changes detected
+
+        return
+
+    else:
+
+        if email != old email:
+
+            create a new user
+
+            update the company_admin to the new user's id
+
+        else:
+
+            if password == password_confirmation:
+
+                update company_admin to have a new password
+
+            else:
+
+                alert user of their invalid credentials
+
+
+
+
+============================================================================================================

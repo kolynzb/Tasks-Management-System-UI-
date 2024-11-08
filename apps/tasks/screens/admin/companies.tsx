@@ -8,7 +8,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import Input from "../../components/input";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "../../components/button";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Table from "../../components/table";
 import Header from "../../components/header";
 import Modal from "../../components/modal"
@@ -241,7 +241,7 @@ const companies = () => {
   
   
   const addComany = (new_company: Company) => {
-    setCompanies([...companies, new_company]);
+    setCompanies([new_company, ...companies]);
   };
 
   const setter=(id)=>{
@@ -258,8 +258,32 @@ const companies = () => {
     dispatch(setLoadingState(loading))
 
   },[loading])
+
+  const [currentCompany, setCurrentCompany]=useState({})
+
+  const editCompany=(row: any)=>{
+
+    setCurrentCompany(row)
+    setCMOpen(true)
+
+  }
+
+  const updateCompany=(payload: any)=>{
+    setCompanies(companies?.map(company => company?.id == payload["id"] ? payload : company))
+  }
+
+  useEffect(()=>{
+
+    if(!CMOpen){
+      setCurrentCompany(null)
+    }
+
+  },[CMOpen])
   
   return (
+    JSON.parse(localStorage.getItem("TMS_USER"))?.role != "admin" ? (
+      <Navigate to={"/"}/>
+    ) :
     <div>
       {/* header  */}
       <Header
@@ -281,11 +305,12 @@ const companies = () => {
           edit
           view
           redirect_path="/admin/company"
+          editor={editCompany}
         />
       )}
 
       {CMOpen && (
-        <Modal open={CMOpen} setOpen={setCMOpen} title="add company" content={<AddCompany add={addComany} setOpen={setCMOpen}/>}/>
+        <Modal open={CMOpen} setOpen={setCMOpen} title={currentCompany ? "Edit company" : "Add company"} content={<AddCompany values={currentCompany && currentCompany} updateCompany={updateCompany} add={addComany} setOpen={setCMOpen}/>}/>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { getTheme, getUser, SERVER_URL, setAlert } from '../../model/data'
 import Input from "../../components/input"
 import Button from "../../components/button"
 import Text from "../../components/text"
+import { verifyPassword } from '../../utils/password_checker'
 
 const change_password = () => {
 
@@ -25,6 +26,18 @@ const change_password = () => {
 
   const onSubmit=async(e)=>{
     e.preventDefault()
+
+    if (!verifyPassword(password.value)) {
+      dispatch(
+        setAlert({
+          title: "Weak password",
+          body: "password must contain 1 number, a lowecase, uppercase and special character",
+          mode: "error",
+        })
+      );
+      return;
+    }
+
     if(password?.value != passwordConfirmation?.value){
       dispatch(setAlert({title: "Password mismatch", body: "Please provide matching passwords", mode: "error"}))
       return

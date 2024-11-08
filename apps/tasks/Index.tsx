@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 // screens 
-import {Routes, Route} from "react-router-dom"
+import {Routes, Route, Navigate} from "react-router-dom"
 import AdminRouter from "./screens/admin/router"
 import CompanyRouter from "./screens/company/router"
 import DepartmentRouter from "./screens/department/router"
@@ -20,11 +20,13 @@ const Index = () => {
   const loading = useSelector(loadingState)
   const dispatch = useDispatch()
 
-  // useEffect(()=>{
-  //   setTimeout(() => {
-  //     dispatch(setAlert({title: "User created successfully", mode: "success", body: "Congragulations!"}))
-  //   }, 1000);
-  // },[])
+  useEffect(()=>{
+    if(alert?.title && !alert?.buttons){
+      setTimeout(() => {
+        dispatch(setAlert({title: "", mode: "", body: ""}))
+      }, 1500);
+    }
+  },[alert?.title])
 
   return (
     <>
@@ -35,6 +37,7 @@ const Index = () => {
       <Route path='/company/*' Component={CompanyRouter}/>
       <Route path='/department/*' Component={DepartmentRouter}/>
       <Route path='/employee/*' Component={EmployeeRouter}/>
+      <Route path='*' element={<Navigate to="/"/>}/>
 
       
     </Routes>

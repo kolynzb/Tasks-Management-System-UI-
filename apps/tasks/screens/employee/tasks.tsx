@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import Text from "../../components/text";
 import { FaCirclePlus, FaEye, FaPen } from "react-icons/fa6";
@@ -11,6 +12,7 @@ import Modal from "../../components/modal"
 import { DELETE, GET } from "../../utils/HTTP";
 import AddTask from "../../components/add_task";
 import Input from "../../components/input"
+import moment from "moment";
 
 
 
@@ -22,7 +24,46 @@ const tasks = () => {
   const theme: Theme = useSelector(getTheme);
   const [open, setOpen] = useState(false);
   const server = useSelector(SERVER_URL);
-  const [tasks, setTasks] = useState<any[]>([]);
+
+  // tasks 
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([])
+  const [searchResults, setSearchResults] = useState([])
+  const [dailyTasks, setDailyTasks] = useState([])
+  const [filter, setFilter] = useState(false)
+  const [currentTask, setCurrentTask] = useState(null)
+
+
+  // ==============================task helper functions =============================================
+
+  const populateFilteredTasks=()=>{
+
+  }
+
+  const populateSearchResults=()=>{
+
+  }
+
+  const populateDailyTasks=()=>{
+    const results = []
+    tasks?.forEach(task => {
+      const task_date = moment(task?.created_at)?.calendar()
+
+      if(task_date?.includes("Today") && !results?.some(t => t?.id == task?.id)){
+        results.push(task)
+      }
+
+    })
+    setDailyTasks(results)
+  }
+
+  // set today's tasks 
+  useEffect(()=>{
+tasks?.length != 0 && populateDailyTasks()
+  },[tasks])
+
+  // ==============================end task helper functions =============================================
+
   const { id } = useParams();
   const dispatch = useDispatch()
   const [details, setDetails] = useState("")
@@ -31,8 +72,10 @@ const tasks = () => {
   const { state } = useLocation();
   const [loading, setLoading] = useState(false)
 
+  const now = new Date()
+
   const [startDate, setStartDate] = useState({
-    value: "",
+    value: ``,
     error: null
   })
 
@@ -45,6 +88,14 @@ const tasks = () => {
     value: "",
     error: null
   })
+
+
+  useEffect(()=>{
+    setTimeout(() => {
+      setStartDate({...startDate, value: moment()?.format("YYYY-MM-DD")})
+    setEndDate({...startDate, value: moment()?.format("YYYY-MM-DD")})
+    }, 1000);
+  },[])
 
   useEffect(() => {
     GET({path: "/tasks/" + id, setData: setTasks, setLoading: setLoading})
@@ -60,20 +111,16 @@ const tasks = () => {
 
   const getTotalHours=()=>{
 
-    if(filteredTasks?.length )
-
-    if(tasks?.length != 0){
+    if(filteredTasks?.length != 0){
       let total = 0
-      tasks?.forEach(task => {
+      filteredTasks?.forEach(task => {
         total += parseFloat(task["duration"])
       })
       setHours(total)
+    }else{
+      setHours(0)
     }
   }
-
-  useEffect(()=>{
-    getTotalHours()
-  },[tasks])
 
   const setter=(id)=>{
     dispatch(setAlert({title: "", body: "", mode: "normal"}))
@@ -81,25 +128,23 @@ const tasks = () => {
     getTotalHours()
   }
 
-  const [filteredTasks, setFilteredTasks] = useState([])
-
   const searchTasks=(query: string)=>{
-    const results = tasks?.filter(task => task?.body?.includes(query?.toString()))
+    const results = filteredTasks?.filter(task => task?.body?.includes(query?.toString()))
     if(results?.length !=0 ){
-      setFilteredTasks(results)
+      setSearchResults(results)
     }else{
-      setFilteredTasks([])
+      setSearchResults([])
     }
   }
 
   const filterTasks =(startDate:string, endDate: string)=>{
-      const start = startDate ? new Date(startDate).getTime() : new Date().getTime()
-      const end = endDate ? new Date(endDate).getTime() : new Date().getTime()
+      const start = moment(startDate)
+      const end = moment(endDate)
       
       const results = []
       tasks.forEach(task =>{
-        const _date = new Date(task.created_at).getTime()
-        if(_date >= start && _date <= end ){
+        const _date = moment(task?.created_at)
+        if(_date?.isSameOrAfter(start) && _date.isSameOrBefore(end) ){
           results.push(task)
         }
       })
@@ -110,11 +155,13 @@ const tasks = () => {
 
   useEffect(()=>{
 
-    if(startDate && endDate){
+    if(startDate.value && endDate.value){
       filterTasks(startDate.value, endDate.value)
+    }else{
+      
     }
 
-  }, [startDate, endDate])
+  }, [startDate, endDate, tasks])
 
   useEffect(()=>{
 
@@ -124,13 +171,39 @@ const tasks = () => {
 
   },[search])
 
+  useEffect(()=>{
+
+    getTotalHours()
+
+  },[filteredTasks])
+
+
+  const editTask=(row)=>{
+    setCurrentTask(row)
+    setOpen(true)
+  }
+
+  useEffect(()=>{
+
+    if(!open){
+      setCurrentTask(null)
+    }
+
+  },[open])
+
+  const updateTasks=(payload)=>{
+    setTasks(tasks?.map(task => task?.id == payload?.id ? payload : task))
+  }
+  
+
+
   return (
     <div>
       {/* header  */}
       <Header
         title="a task"
         setOpen={setOpen}
-        count={tasks?.length}
+        count={filteredTasks?.length}
         heading="Tasks"
       />
 
@@ -212,13 +285,33 @@ const tasks = () => {
       {/* body  */}
       {
 
-        search?.value || startDate.value || endDate.value
+        // search?.value || 
+        // startDate.value || endDate.value
+        // ?
+        search?.value
         ?
+        searchResults?.length == 0
+        ?
+        <Text is_h1>No results found</Text>
+        :
+        <Table
+        setter={setter}
+        showBody={showBody}
+        editor={editTask}
+        columns={["body", "duration"]}
+        rows={searchResults}
+        delete
+        edit
+        view
+        // redirect_path="/department"
+      />
+        :
         filteredTasks?.length == 0
         ?
         <Text is_h1>No results found</Text>
         :
         <Table
+        editor={editTask}
         setter={setter}
         showBody={showBody}
         columns={["body", "duration"]}
@@ -228,22 +321,22 @@ const tasks = () => {
         view
         // redirect_path="/department"
       />
-        :
+        // :
 
-        tasks?.length == 0
-        ?
-        <Text is_h1>No results found</Text>
-        :
-        <Table
-        setter={setter}
-        showBody={showBody}
-        columns={["body", "duration"]}
-        rows={tasks}
-        delete
-        edit
-        view
-        // redirect_path="/department"
-      />
+        // <Text is_h1>Please select a date</Text>
+      //   dailyTasks?.length == 0
+      //   ?
+      //   :
+      //   <Table
+      //   setter={setter}
+      //   showBody={showBody}
+      //   columns={["body", "duration", "project_name"]}
+      //   rows={dailyTasks}
+      //   delete
+      //   edit
+      //   view
+      //   // redirect_path="/department"
+      // />
 
       
       }
@@ -252,7 +345,7 @@ const tasks = () => {
         details && <Modal open={Boolean(details)} setOpen={setDetails} content={<Text justify>{details}</Text>} title="Task details"/>
       }
 
-      {open && <Modal title="add task" open={open} setOpen={setOpen} content={<AddTask setData={setTasks} data={tasks} setOpen={setOpen}/>}/>
+      {open && <Modal title={currentTask ? "Edit task" : "add task"} open={open} setOpen={setOpen} content={<AddTask values={currentTask}  setData={setTasks} updateTasks={updateTasks} data={tasks} setOpen={setOpen}/>}/>
       }
     </div>
   );

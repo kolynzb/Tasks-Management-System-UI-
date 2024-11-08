@@ -1,4 +1,4 @@
-export const server_host = `https://tekjuice.pythonanywhere.com/`
+export const server_host = `http://localhost:8000`
 export const server_url = `${server_host}/api/v1`
 
 interface GETParams{
@@ -19,8 +19,8 @@ interface UPDATEParams{
     errorMessage?: ()=>void
 }
 interface DELETEParams{
-    setData: (data: any[])=>void
-    data: any[]
+    setData?: (data: any[])=>void
+    data?: any[]
     path: string
     setOpen?: (open: boolean)=>void
     successMessage?: ()=>void
@@ -70,8 +70,10 @@ export const POST =async(params: POSTParams)=>{
         const data = await res.json()
         params?.setData([...params?.data, data])
         params?.setOpen && params?.setOpen(false)
+        params?.successMessage && params?.successMessage()
         }else{
-            alert("failed!")
+            // alert("failed!")
+            params?.errorMessage && params?.errorMessage()
         }
     }
     catch(error){

@@ -3,7 +3,14 @@ import React, { useState } from "react";
 import Background from "../../components/background";
 import XStack from "../../components/x_stack";
 import { Theme, User } from "../../types";
-import { getTheme, SERVER_URL, setAlert, setCompany, setDepartment, setUser } from "../../model/data";
+import {
+  getTheme,
+  SERVER_URL,
+  setAlert,
+  setCompany,
+  setDepartment,
+  setUser,
+} from "../../model/data";
 import { useDispatch, useSelector } from "react-redux";
 import Logo from "../../assets/icons/logo.svg";
 import Input from "../../components/input";
@@ -28,31 +35,31 @@ const login = () => {
     error: "",
   });
 
-  const fetchDepartment=async(user_id)=>{
-    setLoading(true)
-    const res = await fetch(`${server}/get_department/${user_id}`)
-    if(res.status == 200){
-      const data = await res.json()
-      dispatch(setDepartment(data))
-      navigate(`/department/1`)
-      setLoading(false)
-    }else{
-      setLoading(false)
+  const fetchDepartment = async (user_id) => {
+    setLoading(true);
+    const res = await fetch(`${server}/get_department/${user_id}`);
+    if (res.status == 200) {
+      const data = await res.json();
+      dispatch(setDepartment(data));
+      navigate(`/department/${data?.id}`);
+      setLoading(false);
+    } else {
+      setLoading(false);
     }
-  }
+  };
 
-  const fetchCompany=async(user_id)=>{
-    setLoading(true)
-    const res = await fetch(`${server}/get_company/${user_id}`)
-    if(res.status == 200){
-      const data = await res.json()
-      dispatch(setCompany(data))
-      navigate(`/admin/company/${data?.id}`)
-      setLoading(false)
-    }else{
-      setLoading(false)
+  const fetchCompany = async (user_id) => {
+    setLoading(true);
+    const res = await fetch(`${server}/get_company/${user_id}`);
+    if (res.status == 200) {
+      const data = await res.json();
+      dispatch(setCompany(data));
+      navigate(`/admin/company/${data?.id}`);
+      setLoading(false);
+    } else {
+      setLoading(false);
     }
-  }
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -95,15 +102,14 @@ const login = () => {
           },
         };
 
-        if(loggedin_user?.role == "company_admin"){
-          fetchCompany(loggedin_user?.user_id)
-        }else if(loggedin_user?.role == "department_admin"){
-          fetchDepartment(loggedin_user?.user_id)
-        }else if(loggedin_user?.role == "admin"){
-          navigate(`/admin/companies`)
-        }
-        else{
-         navigate(`/employee/${loggedin_user?.user_id}`)
+        if (loggedin_user?.role == "company_admin") {
+          fetchCompany(loggedin_user?.user_id);
+        } else if (loggedin_user?.role == "department_admin") {
+          fetchDepartment(loggedin_user?.user_id);
+        } else if (loggedin_user?.role == "admin") {
+          navigate(`/admin/companies`);
+        } else {
+          navigate(`/employee/${loggedin_user?.user_id}`);
         }
         dispatch(setUser(loggedin_user));
         dispatch(
@@ -128,11 +134,26 @@ const login = () => {
     }
   };
 
-  return (
-    // JSON.parse(localStorage.getItem("TMS_USER"))?.email
-    // ?
-    // <Navigate to={"/admin"}/>
-    // :
+  return JSON.parse(localStorage.getItem("TMS_USER"))?.role == "employee" ? (
+    <Navigate
+      to={"/employee/" + JSON.parse(localStorage.getItem("TMS_USER"))?.user_id}
+    />
+  ) : JSON.parse(localStorage.getItem("TMS_USER"))?.role == "company_admin" ? (
+    <Navigate
+      to={
+        "/admin/company/" + JSON.parse(localStorage.getItem("TMS_COMPANY"))?.id
+      }
+    />
+  ) : JSON.parse(localStorage.getItem("TMS_USER"))?.role ==
+    "department_admin" ? (
+    <Navigate
+      to={
+        "/department/" + JSON.parse(localStorage.getItem("TMS_DEPARTMENT"))?.id
+      }
+    />
+  ) : JSON.parse(localStorage.getItem("TMS_USER"))?.role == "admin" ? (
+    <Navigate to={"/admin/companies"} />
+  ) : (
     <Background>
       <XStack>
         {/* empty container  */}

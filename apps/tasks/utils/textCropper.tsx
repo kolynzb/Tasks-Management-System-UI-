@@ -8,6 +8,6 @@ export const TextCropper = (text: string, limit: number): string => {
       return text;
     }
   }else{
-    return "Network Error (refresh to clear)"
+    return ""
   }
 };

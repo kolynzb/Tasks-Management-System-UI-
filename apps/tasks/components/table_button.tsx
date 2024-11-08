@@ -15,6 +15,7 @@ export interface Props {
   redirect_path?: string;
   showBody?: (data: any)=>void,
   setter?: any
+  editor?: any
 }
 
 const table_button = (props: Props) => {
@@ -33,7 +34,7 @@ const table_button = (props: Props) => {
 
   const editRow = () => {
     // alert(props?.row["id"]);
-    setOpen(!open)
+    props?.editor(props?.row)
 
   };
 

@@ -19,6 +19,8 @@ export interface Props {
   showBody?: (data: any)=>void
   rows?: any[]
   setter?: any
+  editor: any
+  toggle?: any
 }
 
 const row = (props: Props) => {
@@ -47,13 +49,13 @@ const row = (props: Props) => {
         )}
 
         {
-          props?.setActive && <td><Switch  row={props?.row} rows={props?.rows}/></td>
+          props?.setActive && <td><Switch toggle={props?.toggle} is_active={props?.row["is_active"]}  row={props?.row} rows={props?.rows}/></td>
         }
 
         {/* edit  */}
-        {props?.edit && user?.role !="employee" && (
+        {props?.edit && user?.role !="employee" && user?.role != "department_admin"  && (
           <span style={{ padding: 15 }}>
-            <TableButton setter={props?.setter}  mode="edit" row={props?.row} />
+            <TableButton editor={props?.editor} setter={props?.setter}  mode="edit" row={props?.row} />
           </span>
         )}
 

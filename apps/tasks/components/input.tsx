@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { getTheme } from "../model/data";
 import { Theme } from "../types";
 
-const input = ({ input, type, placeholder, setter, fullwidth, noBorder,zeroMargin }) => {
+const input = ({ input, type, placeholder, setter, fullwidth, noBorder,zeroMargin, large }) => {
   const theme: Theme = useSelector(getTheme);
 
   return (
@@ -32,6 +32,27 @@ const input = ({ input, type, placeholder, setter, fullwidth, noBorder,zeroMargi
       ) : (
         ""
       )}
+      {
+
+        large
+        ?
+        <textarea 
+        value={input.value}
+        minLength={4}
+        placeholder={placeholder}
+        onChange={(e) => setter({ ...input, value: e.target.value })}
+        required
+        name="" id="" rows={5} style={{
+          margin: "0 10px",
+          color: theme?.text,
+          background: "transparent",
+          width: "100%",
+          border: "none",
+          outline: "none",
+          fontFamily: "poppins",
+          fontSize: 12.5
+        }}></textarea>
+        :
       <input
         required
         style={{
@@ -50,6 +71,7 @@ const input = ({ input, type, placeholder, setter, fullwidth, noBorder,zeroMargi
         placeholder={placeholder}
         onChange={(e) => setter({ ...input, value: e.target.value })}
       />
+      }
     </div>
   );
 };

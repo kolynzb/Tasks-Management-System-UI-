@@ -13,7 +13,9 @@ export interface Props {
   redirect_path?: string,
   setActive?: (active: boolean)=>void
   showBody?: (data: any)=>void
-  setter: any
+  setter: any,
+  editor: any,
+  toggle: any
 }
 
 const Table = (props: Props) => {
@@ -48,7 +50,7 @@ const Table = (props: Props) => {
 
       {/* rows  */}
       {props?.rows?.map((row, index) => (
-        <Row setter={props?.setter} rows={props?.rows} showBody={props?.showBody} setActive={props?.setActive} redirect_path={props?.redirect_path} key={index} row={row} columns = {props?.columns} edit={props?.edit} view ={props?.view} delete={props?.delete}/>
+        <Row toggle={props?.toggle} editor={props?.editor} setter={props?.setter} rows={props?.rows} showBody={props?.showBody} setActive={props?.setActive} redirect_path={props?.redirect_path} key={index} row={row} columns = {props?.columns} edit={props?.edit} view ={props?.view} delete={props?.delete}/>
       ))}
     </table>
   );
