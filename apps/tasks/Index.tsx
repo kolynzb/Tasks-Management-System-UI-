@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 // screens 
-import {Routes, Route, Navigate} from "react-router-dom"
+import {Routes, Route, Navigate, useNavigate, useLocation} from "react-router-dom"
 import AdminRouter from "./screens/admin/router"
 import CompanyRouter from "./screens/company/router"
 import DepartmentRouter from "./screens/department/router"
@@ -9,10 +9,12 @@ import EmployeeRouter from "./screens/employee/router"
 import AuthRouter from "./screens/auth/router"
 import "./app.css"
 import AlertComponent from "./components/alert"
-import { Alert } from './types'
+import { Alert, Theme } from './types'
 import { useDispatch, useSelector } from 'react-redux'
-import { alert_msg, loadingState, setAlert } from './model/data'
+import { alert_msg, getTheme, loadingState, setAlert } from './model/data'
 import Loader from "./components/loader"
+import { FaBackspace } from 'react-icons/fa'
+import Text from "./components/text"
 
 const Index = () => {
 
@@ -27,6 +29,33 @@ const Index = () => {
       }, 1500);
     }
   },[alert?.title])
+
+  const theme: Theme = useSelector(getTheme)
+  const {pathname} = useLocation()
+
+  const navigate = useNavigate()
+
+  const BackButton=()=>{
+    return(
+      <div 
+      onClick={()=>navigate(-1)}
+      style={{
+        position: "fixed",
+        background: theme?.paper,
+        bottom: "5%",
+        right: "5%",
+        display:"flex",
+        alignItems: "center",
+        boxShadow: "10px 10px 20px rgba(0,0,0,.1)",
+        padding: "15px 30px",
+        borderRadius: 100,
+        cursor: "pointer"
+      }}>
+        <FaBackspace style={{marginRight: 10}}/>
+        <Text>Back</Text>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -48,6 +77,11 @@ const Index = () => {
     }
     {
       loading && <Loader/>
+    }
+    {
+      pathname != "/"
+      &&
+      <BackButton />
     }
     </>
   )
