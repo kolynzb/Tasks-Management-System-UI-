@@ -15,20 +15,20 @@ import Modal from "../../components/modal"
 import AddCompany from "../../components/add_company"
 import { DELETE, GET } from "../../utils/HTTP";
 
-export interface Company {
+export interface Project {
   admin_details: User;
   admin: number;
   id: number;
   name: string;
 }
 
-export interface CompanyModalProps {
+export interface ProjectModalProps {
   open: boolean;
   setOpen: any;
-  addCompany: any;
+  addProject: any;
 }
 
-const CompanyModal = (props: CompanyModalProps) => {
+const ProjectModal = (props: ProjectModalProps) => {
   const theme: Theme = useSelector(getTheme);
 
   const [name, setName] = useState({
@@ -53,7 +53,7 @@ const CompanyModal = (props: CompanyModalProps) => {
 
   const onSubmit = async () => {
     setLoading(true);
-    const res = await fetch(`${server}/company_admins`, {
+    const res = await fetch(`${server}/projects`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -64,18 +64,20 @@ const CompanyModal = (props: CompanyModalProps) => {
       }),
     });
 
+    
+
     if (res.status == 201) {
       const data = await res.json();
-      alert("User has been created Successfully, now uploading company...");
-      uploadCompany(data?.id);
+      alert("User has been created Successfully, now uploading project...");
+      uploadProject(data?.id);
     } else {
-      alert("Failed to add company admin");
+      alert("Failed to add project admin");
       setLoading(false);
     }
   };
 
-  const uploadCompany = async (admin_id: number) => {
-    const res = await fetch(`${server}/companies`, {
+  const uploadProject = async (admin_id: number) => {
+    const res = await fetch(`${server}/projects`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -89,9 +91,9 @@ const CompanyModal = (props: CompanyModalProps) => {
     if (res.status == 201) {
       setLoading(false);
       const data = await res.json();
-      alert("Successfully added company");
+      alert("Successfully added project");
       props?.setOpen(false);
-      props?.addCompany(data);
+      props?.addProject(data);
       console.log(data);
     } else {
       setLoading(false);
@@ -161,7 +163,7 @@ const CompanyModal = (props: CompanyModalProps) => {
               justifyContent: "space-between",
             }}
           >
-            <Text>Add a new company</Text>
+            <Text>Add a new project</Text>
 
             {/* close button  */}
             <div
@@ -184,7 +186,7 @@ const CompanyModal = (props: CompanyModalProps) => {
             <Input
               noBorder
               fullwidth
-              placeholder={"Company name"}
+              placeholder={"Project name"}
               type={"text"}
               setter={setName}
               input={name}
@@ -193,7 +195,7 @@ const CompanyModal = (props: CompanyModalProps) => {
             <Input
               noBorder
               fullwidth
-              placeholder={"Company email"}
+              placeholder={"Project email"}
               type={"email"}
               setter={setEmail}
               input={email}
@@ -221,7 +223,7 @@ const CompanyModal = (props: CompanyModalProps) => {
               loading={loading}
               fullwidth
               onClick={onSubmit}
-              title={"Add company"}
+              title={"Add project"}
             />
           </div>
         </motion.div>
@@ -230,27 +232,27 @@ const CompanyModal = (props: CompanyModalProps) => {
   );
 };
 
-const companies = () => {
+const projects = () => {
   const theme: Theme = useSelector(getTheme);
   const [CMOpen, setCMOpen] = useState(false);
   const server = useSelector(SERVER_URL);
   const [loading, setLoading] = useState(true)
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const dispatch = useDispatch()
 
   
   
-  const addComany = (new_company: Company) => {
-    setCompanies([new_company, ...companies]);
+  const addProject = (new_project: Project) => {
+    setProjects([new_project, ...projects]);
   };
 
   const setter=(id)=>{
     dispatch(setAlert({title: "", body: "", mode: "normal"}))
-    DELETE({data: companies, setData: setCompanies, path: "/company/" + id,id: id })
+    DELETE({data: projects, setData: setProjects, path: "/project/" + id,id: id })
   }
   
   useEffect(() => {
-    GET({path: "/companies", setData: setCompanies, setLoading: setLoading})
+    GET({path: "/projects", setData: setProjects, setLoading: setLoading})
   }, []);
   
   useEffect(()=>{
@@ -259,23 +261,23 @@ const companies = () => {
 
   },[loading])
 
-  const [currentCompany, setCurrentCompany]=useState({})
+  const [currentProject, setCurrentProject]=useState({})
 
-  const editCompany=(row: any)=>{
+  const editProject=(row: any)=>{
 
-    setCurrentCompany(row)
+    setCurrentProject(row)
     setCMOpen(true)
 
   }
 
-  const updateCompany=(payload: any)=>{
-    setCompanies(companies?.map(company => company?.id == payload["id"] ? payload : company))
+  const updateProject=(payload: any)=>{
+    setProjects(projects?.map(project => project?.id == payload["id"] ? payload : project))
   }
 
   useEffect(()=>{
 
     if(!CMOpen){
-      setCurrentCompany(null)
+      setCurrentProject(null)
     }
 
   },[CMOpen])
@@ -288,32 +290,32 @@ const companies = () => {
       {/* header  */}
       <Header
         setOpen={setCMOpen}
-        title="company"
-        count={companies?.length}
-        heading="Companies"
+        title="project"
+        count={projects?.length}
+        heading="Projects"
       />
 
-      {/* companies list  */}
-      {companies?.length == 0 ? (
+      {/* projects list  */}
+      {projects?.length == 0 ? (
         <Text is_h1>No results found</Text>
       ) : (
         <Table
           setter={setter}
           columns={["name", "admin_email"]}
-          rows={companies}
+          rows={projects}
           delete
           edit
           view
-          redirect_path="/admin/company"
-          editor={editCompany}
+          redirect_path="/admin/project"
+          editor={editProject}
         />
       )}
 
       {CMOpen && (
-        <Modal open={CMOpen} setOpen={setCMOpen} title={currentCompany ? "Edit company" : "Add company"} content={<AddCompany values={currentCompany && currentCompany} updateCompany={updateCompany} add={addComany} setOpen={setCMOpen}/>}/>
+        <Modal open={CMOpen} setOpen={setCMOpen} title={currentProject ? "Edit project" : "Add project"} content={<AddProject values={currentProject && currentProject} updateProject={updateProject} add={addProject} setOpen={setCMOpen}/>}/>
       )}
     </div>
   );
 };
 
-export default companies;
+export default projects;
