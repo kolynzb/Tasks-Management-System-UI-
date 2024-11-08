@@ -7,7 +7,7 @@ import {motion} from "framer-motion"
 import { Company, Department, Theme, User } from '../types'
 import Button from "./button"
 import { useNavigate } from 'react-router-dom'
-import { FaPeopleGroup } from 'react-icons/fa6'
+import { FaDiagramProject, FaPeopleGroup } from 'react-icons/fa6'
 
 const sidebar = () => {
 
@@ -37,6 +37,11 @@ const sidebar = () => {
       icon: <FaHotel style={{marginRight: 10}} color={theme?.text}/>,
       label: "View all companies",
       link: "/admin/companies"
+    },
+    {
+      icon: <FaDiagramProject  style={{marginRight: 10}} color={theme?.text}/>,
+      label: "view all Projects",
+      link: "/company/projects"
     },
     // {
     //   icon: <FaUserAlt style={{marginRight: 10}} color={theme?.text}/>,
